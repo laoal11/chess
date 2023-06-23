@@ -22,7 +22,6 @@ public class Bishop extends Piece {
         addValidMovesInDirection(board, validMoves, x, y, 1, -1); // up-left
         addValidMovesInDirection(board, validMoves, x, y, -1, 1); // down-right
         addValidMovesInDirection(board, validMoves, x, y, -1, -1); // down-left
-        System.out.println(validMoves);
 
         return validMoves;
     }

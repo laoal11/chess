@@ -10,11 +10,6 @@ public class Move {
     final Tile dst;
     private boolean castlingMove = false;
 
-
-    public Player getPlayer() {
-        return player;
-    }
-
     public Tile getSrc() {
         return src;
     }
@@ -25,8 +20,8 @@ public class Move {
 
     public Move(Player player, Tile src, Tile dst) {
         this.player = player;
-        this.src = src;
-        this.dst = dst;
+        this.src = new Tile(src.getPiece(), src.getX(), src.getY());
+        this.dst = new Tile(dst.getPiece(), dst.getX(), dst.getY());
     }
 
     public void setCastlingMove(boolean castlingMove) {

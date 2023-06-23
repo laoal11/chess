@@ -1,14 +1,12 @@
 package main.java.gui;
 
-import main.java.logic.Game;
-import main.java.logic.Piece;
-import main.java.logic.Player;
-import main.java.logic.Tile;
+import main.java.logic.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,13 +24,33 @@ public class DisplayBoard extends JFrame {
 
     private Tile selectedTile;
 
-    public DisplayBoard(Player p1, Player p2) {
+    private JPanel chessBoard;
+
+    public DisplayBoard(Game game, Player p1, Player p2) {
         this.imageHandler = new ImageHandler();
         this.markedSquares = new ArrayList<>();
         this.setTitle("Board");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        this.setLayout(new BorderLayout());
         this.setSize(600, 600);
+        //chessBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        initBoard();
+
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+
+        JButton restartButton = new JButton("Restart");
+        restartButton.addActionListener(e -> restartGame());
+        buttonPanel.add(restartButton);
+
+        this.add(buttonPanel, BorderLayout.NORTH);
+        this.add(chessBoard, BorderLayout.CENTER);
+
+        this.setVisible(true);
+        this.game = game;
+    }
+
+    private void initBoard() {
+        chessBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 BoardSquare square = new BoardSquare(i, j, imageHandler.getMarker());
@@ -44,26 +62,36 @@ public class DisplayBoard extends JFrame {
                     }
                 });
                 squares[i][j] = square;
-                this.add(square);
+                chessBoard.add(square);
             }
         }
         setupInitialPieces();
-        this.setVisible(true);
-        this.game = new Game(p1, p2);
+    }
+
+    private void restartGame() {
+        game.restartGame();
+        removeMarkers();
+        setupInitialPieces();
     }
 
     private void addClickLogic(int x, int y) {
-        System.out.println("Clicked on square: (" + x + ", " + y + ")");
         Tile sourceTile = game.getBoard().getTile(x, y);
-
         if(selectedTile != null) {
             if(markedSquares.contains(sourceTile)) {
                 Piece temp = selectedTile.getPiece();
+                boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
+                game.getBoard().printBoard();
+                if(!canMakeMove) {
+                    return;
+                }
                 removeMarkers();
-                game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
                 setTileImage(sourceTile.getX(), sourceTile.getY(), imageHandler.getImageByPiece(temp));
                 removeTileImage(selectedTile.getX(), selectedTile.getY());
                 selectedTile = null;
+                if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
+                    System.out.println("GAME IS OVER");
+                    turnOffAllSquares();
+                }
                 return;
             }
         }
@@ -81,6 +109,17 @@ public class DisplayBoard extends JFrame {
         }
         markedSquares = validMoves;
         selectedTile = sourceTile;
+    }
+
+    private void turnOffAllSquares() {
+        for(int i = 0; i < BOARD_SIZE; i++) {
+            for(int j = 0; j < BOARD_SIZE; j++) {
+                MouseListener[] mouseListeners = squares[i][j].getMouseListeners();
+                for (MouseListener ml : mouseListeners) {
+                    squares[i][j].removeMouseListener(ml);
+                }
+            }
+        }
     }
 
     private BoardSquare getTile(int row, int col) {
@@ -109,6 +148,12 @@ public class DisplayBoard extends JFrame {
     }
 
     private void setupInitialPieces() {
+        for(int i = 0; i < BOARD_SIZE; i++) {
+            for(int j = 0; j < BOARD_SIZE; j++) {
+                getTile(i, j).removeTileImage();
+            }
+        }
+
         //rooks
         setTileImage(0,0, imageHandler.getBlackRook());
         setTileImage(0,7, imageHandler.getBlackRook());

@@ -60,10 +60,10 @@ public class Board {
                 tiles[i][j] = new Tile(null, i, j);
             }
         }
-        System.out.println("BOARD IS READY: ");
     }
 
     public void printBoard() {
+        System.out.println("---------------------------------------------------------");
         for(Tile[] row : tiles) {
             System.out.print("[ ");
             for(Tile tile : row) {
@@ -71,6 +71,7 @@ public class Board {
             }
             System.out.println(" ]");
         }
+        System.out.println("---------------------------------------------------------");
     }
 
     private static String padRight(Piece piece, int n) {
