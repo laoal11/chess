@@ -35,6 +35,9 @@ public class Game {
         init(players[0], players[1]);
     }
 
+    public void changeCurrentPlayer() {
+        currentPlayer = players[0] == currentPlayer ? players[1] : players[0];
+    }
 
     public boolean playerMove( int startRow, int startColumn, int endRow, int endColumn) {
         Tile start = board.getTile(startRow, startColumn);
@@ -66,11 +69,7 @@ public class Game {
             revertLastMove();
             return false;
         }
-        if(player == players[0]) {
-            currentPlayer = players[1];
-        } else {
-            currentPlayer = players[0];
-        }
+        changeCurrentPlayer();
 
         if(isCheck(player.isWhiteSide())) {
             if(isCheckmate(player.isWhiteSide())) {
@@ -97,13 +96,14 @@ public class Game {
         lastMoves.push(move);
     }
 
-    private void revertLastMove() {
-        if(lastMoves.isEmpty()) return;
-        Move lastMove = lastMoves.peek();
+    public Move revertLastMove() {
+        if(lastMoves.isEmpty()) return null;
+        Move lastMove = lastMoves.pop();
         Tile src = lastMove.getSrc();
         Tile dst = lastMove.getDst();
         board.getTile(dst.getX(), dst.getY()).setPiece(dst.getPiece());
         board.getTile(src.getX(), src.getY()).setPiece(src.getPiece());
+        return lastMove;
     }
 
     private boolean isCheck(boolean isWhite) {

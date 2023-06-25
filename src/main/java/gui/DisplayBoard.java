@@ -39,9 +39,11 @@ public class DisplayBoard extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout());
 
         JButton restartButton = new JButton("Restart");
+        JButton takebackButton = new JButton("Takeback");
         restartButton.addActionListener(e -> restartGame());
+        takebackButton.addActionListener(e -> takebackLastMove());
         buttonPanel.add(restartButton);
-
+        buttonPanel.add(takebackButton);
         this.add(buttonPanel, BorderLayout.NORTH);
         this.add(chessBoard, BorderLayout.CENTER);
 
@@ -68,6 +70,45 @@ public class DisplayBoard extends JFrame {
         setupInitialPieces();
     }
 
+    private void takebackLastMove() {
+        Move lastMove = game.revertLastMove();
+        if(lastMove == null) {
+            return;
+        }
+        Tile src = lastMove.getSrc();
+        Piece srcPiece = src.getPiece();
+        if(srcPiece != null) {
+            setImageForReverting(srcPiece, src);
+        }
+        Tile dst = lastMove.getDst();
+        Piece dstPiece = dst.getPiece();
+        if(dst != null) {
+            setImageForReverting(dstPiece, dst);
+        }
+        game.changeCurrentPlayer();
+        game.getBoard().printBoard();
+    }
+
+    private void setImageForReverting(Piece piece, Tile tile) {
+        if(piece == null) {
+            removeTileImage(tile.getX(), tile.getY());
+        } else if(piece instanceof Pawn) {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhitePawn() : imageHandler.getBlackPawn());
+        } else if(piece instanceof Rook) {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteRook() : imageHandler.getBlackRook());
+        }else if(piece instanceof Knight) {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKnight() : imageHandler.getBlackKnight());
+        }else if(piece instanceof Bishop) {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteBishop() : imageHandler.getBlackBishop());
+
+        }else if(piece instanceof Queen) {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteQueen() : imageHandler.getBlackQueen());
+        }else {
+            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKing() : imageHandler.getBlackKing());
+        }
+
+    }
+
     private void restartGame() {
         game.restartGame();
         removeMarkers();
@@ -90,6 +131,7 @@ public class DisplayBoard extends JFrame {
                 selectedTile = null;
                 if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
                     System.out.println("GAME IS OVER");
+                    System.out.println(game.getState());
                     turnOffAllSquares();
                 }
                 return;

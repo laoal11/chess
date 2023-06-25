@@ -2,10 +2,7 @@ package main.java.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 public class BoardSquare extends JPanel {
     final int x;
