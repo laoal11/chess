@@ -28,7 +28,7 @@ public class Game {
         board = new Board();
         currentPlayer = p1.isWhiteSide() ? p1 : p2;
         lastMoves = new Stack<>();
-        state = GameState.READY;
+        state = GameState.WHITE_TO_MOVE;
     }
 
     public void restartGame() {
@@ -37,9 +37,10 @@ public class Game {
 
     public void changeCurrentPlayer() {
         currentPlayer = players[0] == currentPlayer ? players[1] : players[0];
+        state = currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE;
     }
 
-    public boolean playerMove( int startRow, int startColumn, int endRow, int endColumn) {
+    public boolean playerMove(int startRow, int startColumn, int endRow, int endColumn) {
         Tile start = board.getTile(startRow, startColumn);
         Tile end = board.getTile(endRow, endColumn);
         Move move = new Move(currentPlayer, start, end);
@@ -48,41 +49,36 @@ public class Game {
 
     private boolean makeMove(Player player, Move move) {
         // players turn?
-        if(currentPlayer != player) {
+        if (currentPlayer != player) {
             System.out.println("Wrong player trying to make a move");
             return false;
         }
         Piece sourcePiece = move.getSrc().getPiece();
-        if(sourcePiece.isWhite() != player.isWhiteSide()) {
+        if (sourcePiece.isWhite() != player.isWhiteSide()) {
             System.out.println("Player is trying to make move with opponents piece..");
             return false;
         }
         // valid move?
-        if(!sourcePiece.canMove(board, move.getSrc(), move.getDst())) {
+        if (!sourcePiece.canMove(board, move.getSrc(), move.getDst())) {
             System.out.println("Move was not valid");
             return false;
         }
 
         doMove(move);
 
-        if(isCheck(!player.isWhiteSide())) {
+        if (isCheck(!player.isWhiteSide())) {
             revertLastMove();
             return false;
         }
         changeCurrentPlayer();
 
-        if(isCheck(player.isWhiteSide())) {
-            if(isCheckmate(player.isWhiteSide())) {
+        if (isCheck(player.isWhiteSide())) {
+            if (isCheckmate(player.isWhiteSide())) {
                 state = player.isWhiteSide() ? GameState.WHITE_WON : GameState.BLACK_WON;
                 return true;
             }
-            if(player.isWhiteSide()){
-                state = GameState.BLACK_IN_CHECK;
-            } else {
-                state = GameState.WHITE_IN_CHECK;
-            }
+            state = player.isWhiteSide() ? GameState.BLACK_IN_CHECK : GameState.WHITE_IN_CHECK;
         }
-
         return true;
     }
 
@@ -97,7 +93,7 @@ public class Game {
     }
 
     public Move revertLastMove() {
-        if(lastMoves.isEmpty()) return null;
+        if (lastMoves.isEmpty()) return null;
         Move lastMove = lastMoves.pop();
         Tile src = lastMove.getSrc();
         Tile dst = lastMove.getDst();
@@ -108,19 +104,18 @@ public class Game {
 
     private boolean isCheck(boolean isWhite) {
         //could keep track which pieces of each player are where, makes checking every tile and piece redundant
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 Tile tile = board.getTile(i, j);
                 Piece pieceOnTile = tile.getPiece();
-                if(pieceOnTile != null && (pieceOnTile.isWhite() == isWhite) && !(pieceOnTile instanceof King)) {
-                    for(Tile reachableTile : pieceOnTile.validMoves(board, tile)) {
-                        if(reachableTile.getPiece() != null ) {
-                            if(reachableTile.getPiece() instanceof King) {
+                if (pieceOnTile != null && (pieceOnTile.isWhite() == isWhite) && !(pieceOnTile instanceof King)) {
+                    for (Tile reachableTile : pieceOnTile.validMoves(board, tile)) {
+                        if (reachableTile.getPiece() != null) {
+                            if (reachableTile.getPiece() instanceof King) {
                                 return true;
                             }
                         }
                     }
-
                 }
             }
         }
@@ -129,15 +124,15 @@ public class Game {
 
     private boolean isCheckmate(boolean isWhite) {
         Player playerToEscape = isWhite ? players[1] : players[0];
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 Tile sourceTile = board.getTile(i, j);
                 Piece pieceOnTile = sourceTile.getPiece();
-                if(pieceOnTile == null || pieceOnTile.isWhite() == isWhite) {
+                if (pieceOnTile == null || pieceOnTile.isWhite() == isWhite) {
                     continue;
                 }
                 List<Tile> validMoves = pieceOnTile.validMoves(board, sourceTile);
-                for(Tile tileToMove : validMoves) {
+                for (Tile tileToMove : validMoves) {
                     Move move = new Move(playerToEscape, sourceTile, tileToMove);
                     doMove(move);
                     if(!isCheck(isWhite)) {

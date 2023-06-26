@@ -3,7 +3,8 @@ package main.java.logic;
 
 public class Player {
     final private boolean whiteSide;
-    final private String name;
+    private String name;
+    private int score = 0;
 
     public Player(boolean whiteSide) {
         this.whiteSide = whiteSide;
@@ -15,12 +16,24 @@ public class Player {
         this.name = name;
     }
 
+    public int getScore() {
+        return score;
+    }
+
+    public void increaseScore() {
+        score++;
+    }
+
     public boolean isWhiteSide() {
         return whiteSide;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

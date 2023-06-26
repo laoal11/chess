@@ -34,6 +34,16 @@ public abstract class Piece {
 
     public abstract List<Tile> validMoves(Board board, Tile source);
 
+    public boolean canReach(Board board, Tile source, Tile destination) {
+        List<Tile> tiles = validMoves(board, source);
+        for(Tile tile : tiles) {
+            if(tile == destination) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isInBounds(int x, int y) {
         return x >= 0 && x < 8 && y >= 0 && y < 8;
     }

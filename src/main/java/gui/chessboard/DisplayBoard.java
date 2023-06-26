@@ -1,4 +1,4 @@
-package main.java.gui;
+package main.java.gui.chessboard;
 
 import main.java.logic.*;
 
@@ -26,33 +26,81 @@ public class DisplayBoard extends JFrame {
 
     private JPanel chessBoard;
 
+    private JLabel currentState;
+    private JLabel p1Label;
+    private JLabel p2Label;
+    private Player p1;
+    private Player p2;
+
     public DisplayBoard(Game game, Player p1, Player p2) {
         this.imageHandler = new ImageHandler();
         this.markedSquares = new ArrayList<>();
+        this.p1 = p1;
+        this.p2 = p2;
         this.setTitle("Board");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(new BorderLayout());
-        this.setSize(600, 600);
-        //chessBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
-        initBoard();
+        this.setSize(800, 600);
+        setLocationRelativeTo(null); // center the frame on the screen
 
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        initBoard();
+        JPanel infoPanel = createInfoPanel(p1, p2);
+
+        this.add(chessBoard, BorderLayout.CENTER);
+        this.add(infoPanel, BorderLayout.EAST);
+
+        this.pack(); // Resize the frame to its preferred size
+        this.setVisible(true);
+        this.game = game;
+    }
+
+    private JPanel createInfoPanel(Player p1, Player p2) {
+        JPanel currentPlayerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        currentState = new JLabel(GameState.WHITE_TO_MOVE.getDisplayName());
+        currentState.setFont(new Font(currentState.getFont().getName(), Font.BOLD, 20)); // Set font size to 20
+        currentPlayerPanel.add(currentState);
+
+        JPanel p1LabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        p1Label = new JLabel(getPlayerScore(p1)); // Add score to player's name
+        p1LabelPanel.add(p1Label);
+
+        JPanel p2LabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        p2Label = new JLabel(getPlayerScore(p2)); // Add score to player's name
+        p2LabelPanel.add(p2Label);
 
         JButton restartButton = new JButton("Restart");
         JButton takebackButton = new JButton("Takeback");
         restartButton.addActionListener(e -> restartGame());
         takebackButton.addActionListener(e -> takebackLastMove());
-        buttonPanel.add(restartButton);
-        buttonPanel.add(takebackButton);
-        this.add(buttonPanel, BorderLayout.NORTH);
-        this.add(chessBoard, BorderLayout.CENTER);
 
-        this.setVisible(true);
-        this.game = game;
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.add(restartButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // adds a little space between the buttons
+        buttonPanel.add(takebackButton);
+
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.add(buttonPanel); // Add buttonPanel to infoPanel
+        infoPanel.add(Box.createRigidArea(new Dimension(0,20))); // reduces space between buttonPanel and currentPlayer
+        infoPanel.add(currentPlayerPanel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0,5))); // reduces space between labels
+        infoPanel.add(p1LabelPanel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        infoPanel.add(p2LabelPanel);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // creates some padding
+        return infoPanel;
     }
 
     private void initBoard() {
         chessBoard = new JPanel(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        setupSquares();
+        chessBoard.setPreferredSize(new Dimension(600, 600));
+        setupInitialPieces();
+    }
+
+    private void setupSquares() {
+        chessBoard.removeAll();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 BoardSquare square = new BoardSquare(i, j, imageHandler.getMarker());
@@ -67,7 +115,10 @@ public class DisplayBoard extends JFrame {
                 chessBoard.add(square);
             }
         }
-        setupInitialPieces();
+    }
+
+    private void switchStateLabelToCurrentState() {
+        currentState.setText(game.getState().getDisplayName());
     }
 
     private void takebackLastMove() {
@@ -87,6 +138,7 @@ public class DisplayBoard extends JFrame {
         }
         game.changeCurrentPlayer();
         game.getBoard().printBoard();
+        switchStateLabelToCurrentState();
     }
 
     private void setImageForReverting(Piece piece, Tile tile) {
@@ -100,18 +152,17 @@ public class DisplayBoard extends JFrame {
             setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKnight() : imageHandler.getBlackKnight());
         }else if(piece instanceof Bishop) {
             setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteBishop() : imageHandler.getBlackBishop());
-
         }else if(piece instanceof Queen) {
             setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteQueen() : imageHandler.getBlackQueen());
         }else {
             setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKing() : imageHandler.getBlackKing());
         }
-
     }
 
     private void restartGame() {
         game.restartGame();
-        removeMarkers();
+        switchStateLabelToCurrentState();
+        setupSquares();
         setupInitialPieces();
     }
 
@@ -130,10 +181,13 @@ public class DisplayBoard extends JFrame {
                 removeTileImage(selectedTile.getX(), selectedTile.getY());
                 selectedTile = null;
                 if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
-                    System.out.println("GAME IS OVER");
-                    System.out.println(game.getState());
+                    currentState.setText(game.getState().getDisplayName());
                     turnOffAllSquares();
+                    increaseScoreOfWinner(game.getState());
+                    return;
                 }
+                switchStateLabelToCurrentState();
+
                 return;
             }
         }
@@ -153,10 +207,25 @@ public class DisplayBoard extends JFrame {
         selectedTile = sourceTile;
     }
 
+    private void increaseScoreOfWinner(GameState state) {
+        if(state.equals(GameState.WHITE_WON)) {
+            p1.increaseScore();
+            p1Label.setText(getPlayerScore(p1));
+        } else {
+            p2.increaseScore();
+            p2Label.setText(getPlayerScore(p2));
+        }
+    }
+
+    private String getPlayerScore(Player player) {
+        return player.getName() + ": " + player.getScore();
+    }
+
     private void turnOffAllSquares() {
         for(int i = 0; i < BOARD_SIZE; i++) {
             for(int j = 0; j < BOARD_SIZE; j++) {
                 MouseListener[] mouseListeners = squares[i][j].getMouseListeners();
+
                 for (MouseListener ml : mouseListeners) {
                     squares[i][j].removeMouseListener(ml);
                 }
@@ -195,7 +264,6 @@ public class DisplayBoard extends JFrame {
                 getTile(i, j).removeTileImage();
             }
         }
-
         //rooks
         setTileImage(0,0, imageHandler.getBlackRook());
         setTileImage(0,7, imageHandler.getBlackRook());

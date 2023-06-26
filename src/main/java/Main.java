@@ -1,6 +1,7 @@
 package main.java;
 
-import main.java.gui.DisplayBoard;
+import main.java.gui.chessboard.DisplayBoard;
+import main.java.gui.menu.MainMenu;
 import main.java.logic.Game;
 import main.java.logic.Player;
 
@@ -8,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         Player whitePlayer = new Player(true, "White");
         Player blackPlayer = new Player(false, "Black");
-        Game match = new Game(whitePlayer, blackPlayer);
-        DisplayBoard displayBoard = new DisplayBoard(match, whitePlayer, blackPlayer);
+        MainMenu mainMenu = new MainMenu(whitePlayer, blackPlayer);
+        //DisplayBoard displayBoard = new DisplayBoard(match, whitePlayer, blackPlayer);
     }
 }

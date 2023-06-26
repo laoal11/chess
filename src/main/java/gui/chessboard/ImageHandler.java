@@ -1,4 +1,4 @@
-package main.java.gui;
+package main.java.gui.chessboard;
 
 import main.java.logic.Piece;
 
