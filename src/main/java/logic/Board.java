@@ -1,6 +1,8 @@
 package main.java.logic;
 
 
+import main.java.logic.pieces.*;
+
 public class Board {
     private Tile[][] tiles = new Tile[8][8];
 

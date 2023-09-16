@@ -1,6 +1,7 @@
 package main.java.gui.chessboard;
 
-import main.java.logic.Piece;
+import main.java.logic.pieces.Piece;
+import main.java.logic.pieces.PieceEnum;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -48,18 +49,18 @@ public class ImageHandler {
             return null;
         }
         boolean isWhite = piece.isWhite();
-        switch (piece.getName()) {
-            case "Pawn":
+        switch (piece.getPieceType()) {
+            case PAWN:
                 return isWhite ? whitePawn : blackPawn;
-            case "Rook":
+            case ROOK:
                 return isWhite ? whiteRook : blackRook;
-            case "Knight":
+            case KNIGHT:
                 return isWhite ? whiteKnight : blackKnight;
-            case "Bishop":
+            case BISHOP:
                 return isWhite ? whiteBishop : blackBishop;
-            case "Queen":
+            case QUEEN:
                 return isWhite ? whiteQueen : blackQueen;
-            case "King":
+            case KING:
                 return isWhite ? whiteKing : blackKing;
         }
         return null;

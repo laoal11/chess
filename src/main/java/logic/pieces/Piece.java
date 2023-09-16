@@ -1,4 +1,4 @@
-package main.java.logic;
+package main.java.logic.pieces;
 
 import main.java.logic.Board;
 import main.java.logic.Tile;
@@ -10,15 +10,33 @@ public abstract class Piece {
         return isWhite;
     }
 
-    public String getName() {
-        return name;
+    public PieceEnum getPieceType() {
+        return pieceType;
     }
 
     private boolean isWhite = false;
-    String name;
+    PieceEnum pieceType;
 
     public Piece(boolean isWhite) {
         this.isWhite = isWhite;
+    }
+
+    public static Piece fromString(String piece, boolean isWhite) {
+        switch(piece) {
+            case "Pawn":
+                return new Pawn(isWhite);
+            case "Knight":
+                return new Knight(isWhite);
+            case "Bishop":
+                return new Bishop(isWhite);
+            case "Rook":
+                return new Rook(isWhite);
+            case "Queen":
+                return new Queen(isWhite);
+            case "King":
+                return new King(isWhite);
+        }
+        return null;
     }
 
     public boolean canMove(Board board, Tile source, Tile destination) {
@@ -51,6 +69,6 @@ public abstract class Piece {
     @Override
     public String toString() {
         String color = isWhite ? "White" : "Black";
-        return color + "-" + this.name;
+        return color + "-" + this.pieceType;
     }
 }

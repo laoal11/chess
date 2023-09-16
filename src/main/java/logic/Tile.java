@@ -1,5 +1,7 @@
 package main.java.logic;
 
+import main.java.logic.pieces.Piece;
+
 public class Tile {
     private Piece piece;
 
