@@ -1,5 +1,11 @@
 package main.java.logic;
 
+import main.java.gui.chessboard.PromotionWindow;
+import main.java.logic.pieces.King;
+import main.java.logic.pieces.Pawn;
+import main.java.logic.pieces.Piece;
+import main.java.logic.pieces.PieceEnum;
+
 import java.util.List;
 import java.util.Stack;
 
@@ -63,8 +69,14 @@ public class Game {
             System.out.println("Move was not valid");
             return false;
         }
+        if(isPromotion(move)){
+            move.setPromotionMove(true);
+            System.out.println("Is promotion move!");
+            Piece promotionPiece = openPromotionWindow(currentPlayer.isWhiteSide());
+            move.getSrc().setPiece(promotionPiece);
+        }
 
-        doMove(move);
+        makeMove(move);
 
         if (isCheck(!player.isWhiteSide())) {
             revertLastMove();
@@ -82,7 +94,23 @@ public class Game {
         return true;
     }
 
-    private void doMove(Move move) {
+    private Piece openPromotionWindow(boolean isWhite) {
+        PromotionWindow promotionWindow = new PromotionWindow();
+        String promotionPiece = promotionWindow.getPromotionPiece();
+        return Piece.fromString(promotionPiece, isWhite);
+    }
+
+    private boolean isPromotion(Move move) {
+        Piece srcPiece = move.getSrc().getPiece();
+        if(srcPiece.getPieceType() != PieceEnum.PAWN) {
+            return false;
+        }
+        boolean isWhite = srcPiece.isWhite();
+        int dstX = move.getDst().getX();
+        return((isWhite && dstX == 0) || (!isWhite && dstX == 7));
+    }
+
+    private void makeMove(Move move) {
         int srcX = move.getSrc().getX();
         int srcY = move.getSrc().getY();
         int dstX = move.getDst().getX();
@@ -98,8 +126,15 @@ public class Game {
         Tile src = lastMove.getSrc();
         Tile dst = lastMove.getDst();
         board.getTile(dst.getX(), dst.getY()).setPiece(dst.getPiece());
-        board.getTile(src.getX(), src.getY()).setPiece(src.getPiece());
+        board.getTile(src.getX(), src.getY()).setPiece(getLastMovesSourcePiece(lastMove));
         return lastMove;
+    }
+
+    private Piece getLastMovesSourcePiece(Move move) {
+        if(move.isPromotionMove()){
+            return new Pawn(move.getSrc().getPiece().isWhite());
+        }
+        return move.getSrc().getPiece();
     }
 
     private boolean isCheck(boolean isWhite) {
@@ -134,7 +169,7 @@ public class Game {
                 List<Tile> validMoves = pieceOnTile.validMoves(board, sourceTile);
                 for (Tile tileToMove : validMoves) {
                     Move move = new Move(playerToEscape, sourceTile, tileToMove);
-                    doMove(move);
+                    makeMove(move);
                     if(!isCheck(isWhite)) {
                         revertLastMove();
                         return false;

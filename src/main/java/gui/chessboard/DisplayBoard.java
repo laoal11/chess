@@ -1,6 +1,7 @@
 package main.java.gui.chessboard;
 
 import main.java.logic.*;
+import main.java.logic.pieces.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,7 +72,7 @@ public class DisplayBoard extends JFrame {
         JButton restartButton = new JButton("Restart");
         JButton takebackButton = new JButton("Takeback");
         restartButton.addActionListener(e -> restartGame());
-        takebackButton.addActionListener(e -> takebackLastMove());
+        takebackButton.addActionListener(e -> takeBackLastMove());
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -121,7 +122,7 @@ public class DisplayBoard extends JFrame {
         currentState.setText(game.getState().getDisplayName());
     }
 
-    private void takebackLastMove() {
+    private void takeBackLastMove() {
         Move lastMove = game.revertLastMove();
         if(lastMove == null) {
             return;
@@ -129,7 +130,11 @@ public class DisplayBoard extends JFrame {
         Tile src = lastMove.getSrc();
         Piece srcPiece = src.getPiece();
         if(srcPiece != null) {
-            setImageForReverting(srcPiece, src);
+            if(lastMove.isPromotionMove()) {
+                setImageForReverting(new Pawn(srcPiece.isWhite()), src);
+            } else {
+                setImageForReverting(srcPiece, src);
+            }
         }
         Tile dst = lastMove.getDst();
         Piece dstPiece = dst.getPiece();
@@ -170,14 +175,15 @@ public class DisplayBoard extends JFrame {
         Tile sourceTile = game.getBoard().getTile(x, y);
         if(selectedTile != null) {
             if(markedSquares.contains(sourceTile)) {
-                Piece temp = selectedTile.getPiece();
                 boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
                 game.getBoard().printBoard();
                 if(!canMakeMove) {
                     return;
                 }
                 removeMarkers();
-                setTileImage(sourceTile.getX(), sourceTile.getY(), imageHandler.getImageByPiece(temp));
+                Piece destPiece = game.getBoard().getTile(x, y).getPiece();
+                System.out.println("Destination piece:" + destPiece);
+                setTileImage(sourceTile.getX(), sourceTile.getY(), imageHandler.getImageByPiece(destPiece));
                 removeTileImage(selectedTile.getX(), selectedTile.getY());
                 selectedTile = null;
                 if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
@@ -187,7 +193,6 @@ public class DisplayBoard extends JFrame {
                     return;
                 }
                 switchStateLabelToCurrentState();
-
                 return;
             }
         }

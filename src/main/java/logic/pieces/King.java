@@ -1,13 +1,15 @@
-package main.java.logic;
+package main.java.logic.pieces;
 
+import main.java.logic.Board;
+import main.java.logic.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Rook extends Piece{
-    public Rook(boolean white) {
+public class King extends Piece{
+    public King(boolean white) {
         super(white);
-        name = "Rook";
+        pieceType = PieceEnum.KING;
     }
 
     @Override
@@ -23,6 +25,12 @@ public class Rook extends Piece{
         addValidMovesInDirection(board, validMoves, x, y, 1, 0);  // upward
         addValidMovesInDirection(board, validMoves, x, y, -1, 0); // downward
 
+        // Diagonal moves
+        addValidMovesInDirection(board, validMoves, x, y, 1, 1);  // up-right
+        addValidMovesInDirection(board, validMoves, x, y, 1, -1); // up-left
+        addValidMovesInDirection(board, validMoves, x, y, -1, 1); // down-right
+        addValidMovesInDirection(board, validMoves, x, y, -1, -1); // down-left
+
         return validMoves;
     }
 
@@ -31,19 +39,15 @@ public class Rook extends Piece{
                                           int xDirection, int yDirection) {
         int x = startX + xDirection;
         int y = startY + yDirection;
-
-        while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-            Tile tile = board.getTile(x, y);
-            if (tile.getPiece() == null) {
-                validMoves.add(tile);
-            } else {
-                if (tile.getPiece().isWhite() != isWhite()) {
-                    validMoves.add(tile);
-                }
-                break;
-            }
-            x += xDirection;
-            y += yDirection;
+        if(!isInBounds(x,y )) {
+            return;
+        }
+        Tile tile = board.getTile(x, y);
+        if (tile.getPiece() == null) {
+            validMoves.add(tile);
+        } else if (tile.getPiece().isWhite() != isWhite()) {
+            validMoves.add(tile);
         }
     }
+
 }

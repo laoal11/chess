@@ -1,14 +1,12 @@
 package main.java.logic;
 
-import main.java.logic.Player;
-import main.java.logic.Tile;
-
 public class Move {
 
     final private Player player;
     final private Tile src;
     final Tile dst;
     private boolean castlingMove = false;
+    private boolean isPromotionMove = false;
 
     public Tile getSrc() {
         return src;
@@ -30,5 +28,13 @@ public class Move {
 
     public boolean isCastlingMove() {
         return castlingMove;
+    }
+
+    public void setPromotionMove(boolean promotionMove) {
+        this.isPromotionMove = promotionMove;
+    }
+
+    public boolean isPromotionMove() {
+        return isPromotionMove;
     }
 }

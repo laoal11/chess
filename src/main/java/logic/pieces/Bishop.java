@@ -1,13 +1,17 @@
+package main.java.logic.pieces;
 
-package main.java.logic;
+import main.java.logic.Board;
+import main.java.logic.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Queen extends Piece{
-    public Queen(boolean white) {
+public class Bishop extends Piece {
+
+
+    public Bishop(boolean white) {
         super(white);
-        name = "Queen";
+        pieceType = PieceEnum.BISHOP;
     }
 
     @Override
@@ -15,13 +19,6 @@ public class Queen extends Piece{
         List<Tile> validMoves = new ArrayList<>();
         int x = source.getX();
         int y = source.getY();
-        // Horizontal moves
-        addValidMovesInDirection(board, validMoves, x, y, 0, 1);  // to the right
-        addValidMovesInDirection(board, validMoves, x, y, 0, -1); // to the left
-
-        // Vertical moves
-        addValidMovesInDirection(board, validMoves, x, y, 1, 0);  // upward
-        addValidMovesInDirection(board, validMoves, x, y, -1, 0); // downward
 
         // Diagonal moves
         addValidMovesInDirection(board, validMoves, x, y, 1, 1);  // up-right

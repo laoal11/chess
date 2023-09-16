@@ -1,4 +1,7 @@
-package main.java.logic;
+package main.java.logic.pieces;
+
+import main.java.logic.Board;
+import main.java.logic.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +10,7 @@ public class Pawn extends Piece{
 
     public Pawn(boolean white) {
         super(white);
-        name = "Pawn";
+        pieceType = PieceEnum.PAWN;
     }
 
     @Override

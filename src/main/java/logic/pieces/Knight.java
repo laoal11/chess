@@ -1,4 +1,7 @@
-package main.java.logic;
+package main.java.logic.pieces;
+
+import main.java.logic.Board;
+import main.java.logic.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +9,7 @@ import java.util.List;
 public class Knight extends Piece {
     public Knight(boolean white) {
         super(white);
-        name = "Knight";
+        pieceType = PieceEnum.KNIGHT;
     }
 
     @Override
