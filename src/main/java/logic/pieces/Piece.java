@@ -17,6 +17,9 @@ public abstract class Piece {
     private boolean isWhite = false;
     PieceEnum pieceType;
 
+    private boolean hasMoved = false;
+
+
     public Piece(boolean isWhite) {
         this.isWhite = isWhite;
     }
@@ -60,6 +63,14 @@ public abstract class Piece {
             }
         }
         return false;
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
     }
 
     public boolean isInBounds(int x, int y) {

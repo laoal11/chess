@@ -123,44 +123,20 @@ public class DisplayBoard extends JFrame {
     }
 
     private void takeBackLastMove() {
-        Move lastMove = game.revertLastMove();
-        if(lastMove == null) {
-            return;
-        }
-        Tile src = lastMove.getSrc();
-        Piece srcPiece = src.getPiece();
-        if(srcPiece != null) {
-            if(lastMove.isPromotionMove()) {
-                setImageForReverting(new Pawn(srcPiece.isWhite()), src);
-            } else {
-                setImageForReverting(srcPiece, src);
-            }
-        }
-        Tile dst = lastMove.getDst();
-        Piece dstPiece = dst.getPiece();
-        if(dst != null) {
-            setImageForReverting(dstPiece, dst);
-        }
+        game.revertLastMove();
         game.changeCurrentPlayer();
         game.getBoard().printBoard();
         switchStateLabelToCurrentState();
+        removeMarkers();
+        drawBoard();
     }
 
-    private void setImageForReverting(Piece piece, Tile tile) {
-        if(piece == null) {
-            removeTileImage(tile.getX(), tile.getY());
-        } else if(piece instanceof Pawn) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhitePawn() : imageHandler.getBlackPawn());
-        } else if(piece instanceof Rook) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteRook() : imageHandler.getBlackRook());
-        }else if(piece instanceof Knight) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKnight() : imageHandler.getBlackKnight());
-        }else if(piece instanceof Bishop) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteBishop() : imageHandler.getBlackBishop());
-        }else if(piece instanceof Queen) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteQueen() : imageHandler.getBlackQueen());
-        }else {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKing() : imageHandler.getBlackKing());
+    private void drawBoard() {
+        for(int y = 0; y < 8; y++) {
+            for(int x = 0; x < 8; x++) {
+                Tile tile = game.getBoard().getTile(y, x);
+                setTileImage(y , x, imageHandler.getImageByPiece( tile.getPiece()));
+            }
         }
     }
 
@@ -181,11 +157,8 @@ public class DisplayBoard extends JFrame {
                     return;
                 }
                 removeMarkers();
-                Piece destPiece = game.getBoard().getTile(x, y).getPiece();
-                System.out.println("Destination piece:" + destPiece);
-                setTileImage(sourceTile.getX(), sourceTile.getY(), imageHandler.getImageByPiece(destPiece));
-                removeTileImage(selectedTile.getX(), selectedTile.getY());
                 selectedTile = null;
+                drawBoard();
                 if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
                     currentState.setText(game.getState().getDisplayName());
                     turnOffAllSquares();
@@ -242,10 +215,6 @@ public class DisplayBoard extends JFrame {
         return squares[row][col];
     }
 
-    private void removeTileImage(int row, int col) {
-        getTile(row, col).removeTileImage();
-    }
-
     private void removeMarkers(){
         for(Tile tile : markedSquares) {
             getTile(tile.getX(), tile.getY()).removeMarker();
@@ -260,6 +229,7 @@ public class DisplayBoard extends JFrame {
     private void setTileImage(int row, int col, Image image) {
         BoardSquare square = getTile(row, col);
         square.removeTileImage();
+        if(image == null) return;
         square.setTileImage(image);
     }
 
