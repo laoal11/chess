@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Rook extends Piece{
 
-    private boolean hasMoved = false;
+    //private boolean hasMoved = false;
 
     public Rook(boolean white) {
         super(white);
@@ -52,13 +52,4 @@ public class Rook extends Piece{
             y += yDirection;
         }
     }
-
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
-    }
-
-    public boolean hasMoved() {
-        return hasMoved;
-    }
-
 }

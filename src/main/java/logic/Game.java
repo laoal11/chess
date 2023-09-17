@@ -14,6 +14,7 @@ public class Game {
     //used to create a window with shown pieces
     private Player currentPlayer;
     private Stack<Move> lastMoves;
+    private Stack<GameState> lastGameStates;
 
     private boolean lastMoveCastling = false;
 
@@ -33,7 +34,9 @@ public class Game {
         board = new Board();
         currentPlayer = p1.isWhiteSide() ? p1 : p2;
         lastMoves = new Stack<>();
+        lastGameStates = new Stack<>();
         state = GameState.WHITE_TO_MOVE;
+        lastGameStates.add(GameState.WHITE_TO_MOVE);
     }
 
     public void restartGame() {
@@ -42,11 +45,8 @@ public class Game {
 
     public void changeCurrentPlayer() {
         currentPlayer = players[0] == currentPlayer ? players[1] : players[0];
-        state = currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE;
-    }
-
-    public boolean isLastMoveCastling() {
-        return lastMoveCastling;
+        //lastGameStates.push(currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE);
+        //state = currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE;
     }
 
     public boolean playerMove(int startRow, int startColumn, int endRow, int endColumn) {
@@ -59,24 +59,20 @@ public class Game {
     private boolean makeMove(Player player, Move move) {
         // players turn?
         if (currentPlayer != player) {
-            System.out.println("Wrong player trying to make a move");
             return false;
         }
         Piece sourcePiece = move.getSrc().getPiece();
         if (sourcePiece.isWhite() != player.isWhiteSide()) {
-            System.out.println("Player is trying to make move with opponents piece..");
             return false;
         }
         // valid move?
         if (!sourcePiece.canMove(board, move.getSrc(), move.getDst())) {
-            System.out.println("Move was not valid");
             return false;
         }
         lastMoveCastling = false;
 
-        if(isPromotion(move)){
+        if (isPromotion(move)) {
             move.setPromotionMove(true);
-            System.out.println("Is promotion move!");
             Piece promotionPiece = openPromotionWindow(currentPlayer.isWhiteSide());
             move.getSrc().setPiece(promotionPiece);
         }
@@ -86,10 +82,18 @@ public class Game {
             revertLastMove();
             return false;
         }
-        if(isCastling(move)) {
-            move.setCastlingMove(true);
-            System.out.println("Is castling move!");
+        if (isCastling(move)) {
+            if (state.equals(GameState.WHITE_IN_CHECK) || state.equals(GameState.BLACK_IN_CHECK)) {
+                revertLastMove();
+                return false;
+            }
             Tile[] rookTile = retrieveCastlingRook(move);
+            if (isReachableByOpponent(rookTile[0].getPiece(), rookTile[1])) {
+                System.out.println("Rook is reachable by something");
+                revertLastMove();
+                return false;
+            }
+            move.setCastlingMove(true);
             Move castlingMove = new Move(getCurrentPlayer(), rookTile[0], rookTile[1]);
             castlingMove.setCastlingMove(true);
             makeMove(castlingMove);
@@ -99,35 +103,26 @@ public class Game {
         setHasMovedFlagForKingOrRook(move);
 
         changeCurrentPlayer();
-
+        state = currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE;
         if (isCheck(player.isWhiteSide())) {
             if (isCheckmate(player.isWhiteSide())) {
                 state = player.isWhiteSide() ? GameState.WHITE_WON : GameState.BLACK_WON;
+                lastGameStates.push(state);
                 return true;
             }
             state = player.isWhiteSide() ? GameState.BLACK_IN_CHECK : GameState.WHITE_IN_CHECK;
         }
+        lastGameStates.push(state);
         return true;
     }
 
     private void setHasMovedFlagForKingOrRook(Move move) {
         Piece piece = move.getSrc().getPiece();
-        if(piece instanceof Rook) {
-            Rook rook = (Rook) piece;
-            if(rook.hasMoved()) {
-                return;
-            }
-            rook.setHasMoved(true);
-            move.setIsFirstMove(true);
-        } else if(piece instanceof King) {
-            King king = (King) piece;
-            if(king.hasMoved()) {
-                return;
-            }
-            king.setHasMoved(true);
-            move.setIsFirstMove(true);
-
+        if (piece.hasMoved()) {
+            return;
         }
+        piece.setHasMoved(true);
+        move.setIsFirstMove(true);
     }
 
     private Piece openPromotionWindow(boolean isWhite) {
@@ -138,28 +133,27 @@ public class Game {
 
     private boolean isPromotion(Move move) {
         Piece srcPiece = move.getSrc().getPiece();
-        if(srcPiece.getPieceType() != PieceEnum.PAWN) {
+        if (srcPiece.getPieceType() != PieceEnum.PAWN) {
             return false;
         }
         boolean isWhite = srcPiece.isWhite();
         int dstX = move.getDst().getX();
-        return((isWhite && dstX == 0) || (!isWhite && dstX == 7));
+        return ((isWhite && dstX == 0) || (!isWhite && dstX == 7));
     }
 
     private boolean isCastling(Move move) {
         // code for castling
         Piece piece = move.getSrc().getPiece();
         // is the piece a King?
-        if(!(piece instanceof King)) {
+        if (!(piece instanceof King)) {
             return false;
         }
-        King king = (King) piece;
         // is it the kings first move?
-        if(king.hasMoved()) {
+        if (piece.hasMoved()) {
             return false;
         }
         // does the king move 1 move only to the sides?
-        if(Math.abs(move.getSrc().getY() - move.getDst().getY()) == 1 || Math.abs(move.getSrc().getX() - move.getDst().getX()) > 0) {
+        if (Math.abs(move.getSrc().getY() - move.getDst().getY()) == 1 || Math.abs(move.getSrc().getX() - move.getDst().getX()) > 0) {
             return false;
         }
         return true;
@@ -168,13 +162,13 @@ public class Game {
     private Tile[] retrieveCastlingRook(Move move) {
         boolean isLeftSideCastling = (move.getSrc().getY() - move.getDst().getY()) > 0;
         King king = (King) move.getSrc().getPiece();
-        if(king.isWhite()) {
-            if(isLeftSideCastling) {
+        if (king.isWhite()) {
+            if (isLeftSideCastling) {
                 return new Tile[]{board.getTile(7, 0), board.getTile(7, 3)};
             }
             return new Tile[]{board.getTile(7, 7), board.getTile(7, 5)};
         }
-        if(isLeftSideCastling) {
+        if (isLeftSideCastling) {
             return new Tile[]{board.getTile(0, 0), board.getTile(0, 3)};
         }
         return new Tile[]{board.getTile(0, 7), board.getTile(0, 5)};
@@ -190,22 +184,24 @@ public class Game {
         lastMoves.push(move);
     }
 
-    public Stack<Move> getLastMoves() {
-        return lastMoves;
-    }
-
     public Move revertLastMove() {
         if (lastMoves.isEmpty()) return null;
         Move lastMove = revertLastMoveHelper();
-        if(lastMove.isCastlingMove()) {
+        if (lastMove.isCastlingMove()) {
             return revertLastMoveHelper();
         }
         return lastMove;
     }
 
+    public void revertToLastGameState() {
+        if (lastGameStates.isEmpty()) return;
+        lastGameStates.pop();
+        state = lastGameStates.peek();
+    }
+
     public Move revertLastMoveHelper() {
         Move lastMove = lastMoves.pop();
-        if(lastMove.isFirstMove()) {
+        if (lastMove.isFirstMove()) {
             lastMove.getSrc().getPiece().setHasMoved(false);
         }
         Tile src = lastMove.getSrc();
@@ -217,24 +213,38 @@ public class Game {
     }
 
     private Piece getLastMovesSourcePiece(Move move) {
-        if(move.isPromotionMove()){
+        if (move.isPromotionMove()) {
             return new Pawn(move.getSrc().getPiece().isWhite());
         }
         return move.getSrc().getPiece();
     }
 
     private boolean isCheck(boolean isWhite) {
+        King king = null;
+        Tile kingTile = null;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece piece = board.getTile(i, j).getPiece();
+                if (piece instanceof King && (piece.isWhite() != isWhite)) {
+                    king = (King) piece;
+                    kingTile = board.getTile(i, j);
+                    break;
+                }
+            }
+        }
+        return isReachableByOpponent(king, kingTile);
+    }
+
+    private boolean isReachableByOpponent(Piece target, Tile targetTile) {
         //could keep track which pieces of each player are where, makes checking every tile and piece redundant
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Tile tile = board.getTile(i, j);
                 Piece pieceOnTile = tile.getPiece();
-                if (pieceOnTile != null && (pieceOnTile.isWhite() == isWhite) && !(pieceOnTile instanceof King)) {
+                if (pieceOnTile != null && (pieceOnTile.isWhite() != target.isWhite()) && pieceOnTile != target) {
                     for (Tile reachableTile : pieceOnTile.validMoves(board, tile)) {
-                        if (reachableTile.getPiece() != null) {
-                            if (reachableTile.getPiece() instanceof King) {
-                                return true;
-                            }
+                        if (reachableTile.equals(targetTile)) {
+                            return true;
                         }
                     }
                 }
@@ -256,7 +266,7 @@ public class Game {
                 for (Tile tileToMove : validMoves) {
                     Move move = new Move(playerToEscape, sourceTile, tileToMove);
                     makeMove(move);
-                    if(!isCheck(isWhite)) {
+                    if (!isCheck(isWhite)) {
                         revertLastMove();
                         return false;
                     }

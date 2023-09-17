@@ -124,6 +124,7 @@ public class DisplayBoard extends JFrame {
 
     private void takeBackLastMove() {
         game.revertLastMove();
+        game.revertToLastGameState();
         game.changeCurrentPlayer();
         game.getBoard().printBoard();
         switchStateLabelToCurrentState();
@@ -151,22 +152,7 @@ public class DisplayBoard extends JFrame {
         Tile sourceTile = game.getBoard().getTile(x, y);
         if(selectedTile != null) {
             if(markedSquares.contains(sourceTile)) {
-                boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
-                game.getBoard().printBoard();
-                if(!canMakeMove) {
-                    return;
-                }
-                removeMarkers();
-                selectedTile = null;
-                drawBoard();
-                if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
-                    currentState.setText(game.getState().getDisplayName());
-                    turnOffAllSquares();
-                    increaseScoreOfWinner(game.getState());
-                    return;
-                }
-                switchStateLabelToCurrentState();
-                return;
+                processPotentialMove(sourceTile);
             }
         }
 
@@ -183,6 +169,24 @@ public class DisplayBoard extends JFrame {
         }
         markedSquares = validMoves;
         selectedTile = sourceTile;
+    }
+
+    private void processPotentialMove(Tile sourceTile) {
+        boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
+        game.getBoard().printBoard();
+        if(!canMakeMove) {
+            return;
+        }
+        removeMarkers();
+        selectedTile = null;
+        drawBoard();
+        if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
+            currentState.setText(game.getState().getDisplayName());
+            turnOffAllSquares();
+            increaseScoreOfWinner(game.getState());
+            return;
+        }
+        switchStateLabelToCurrentState();
     }
 
     private void increaseScoreOfWinner(GameState state) {
