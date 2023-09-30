@@ -30,8 +30,8 @@ public class DisplayBoard extends JFrame {
     private JLabel currentState;
     private JLabel p1Label;
     private JLabel p2Label;
-    private Player p1;
-    private Player p2;
+    private final Player p1;
+    private final Player p2;
 
     public DisplayBoard(Game game, Player p1, Player p2) {
         this.imageHandler = new ImageHandler();
@@ -207,7 +207,6 @@ public class DisplayBoard extends JFrame {
         for(int i = 0; i < BOARD_SIZE; i++) {
             for(int j = 0; j < BOARD_SIZE; j++) {
                 MouseListener[] mouseListeners = squares[i][j].getMouseListeners();
-
                 for (MouseListener ml : mouseListeners) {
                     squares[i][j].removeMouseListener(ml);
                 }
