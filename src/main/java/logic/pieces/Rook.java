@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rook extends Piece{
+
+    //private boolean hasMoved = false;
+
     public Rook(boolean white) {
         super(white);
         pieceType = PieceEnum.ROOK;

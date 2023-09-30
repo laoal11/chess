@@ -30,8 +30,8 @@ public class DisplayBoard extends JFrame {
     private JLabel currentState;
     private JLabel p1Label;
     private JLabel p2Label;
-    private Player p1;
-    private Player p2;
+    private final Player p1;
+    private final Player p2;
 
     public DisplayBoard(Game game, Player p1, Player p2) {
         this.imageHandler = new ImageHandler();
@@ -123,44 +123,21 @@ public class DisplayBoard extends JFrame {
     }
 
     private void takeBackLastMove() {
-        Move lastMove = game.revertLastMove();
-        if(lastMove == null) {
-            return;
-        }
-        Tile src = lastMove.getSrc();
-        Piece srcPiece = src.getPiece();
-        if(srcPiece != null) {
-            if(lastMove.isPromotionMove()) {
-                setImageForReverting(new Pawn(srcPiece.isWhite()), src);
-            } else {
-                setImageForReverting(srcPiece, src);
-            }
-        }
-        Tile dst = lastMove.getDst();
-        Piece dstPiece = dst.getPiece();
-        if(dst != null) {
-            setImageForReverting(dstPiece, dst);
-        }
+        game.revertLastMove();
+        game.revertToLastGameState();
         game.changeCurrentPlayer();
         game.getBoard().printBoard();
         switchStateLabelToCurrentState();
+        removeMarkers();
+        drawBoard();
     }
 
-    private void setImageForReverting(Piece piece, Tile tile) {
-        if(piece == null) {
-            removeTileImage(tile.getX(), tile.getY());
-        } else if(piece instanceof Pawn) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhitePawn() : imageHandler.getBlackPawn());
-        } else if(piece instanceof Rook) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteRook() : imageHandler.getBlackRook());
-        }else if(piece instanceof Knight) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKnight() : imageHandler.getBlackKnight());
-        }else if(piece instanceof Bishop) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteBishop() : imageHandler.getBlackBishop());
-        }else if(piece instanceof Queen) {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteQueen() : imageHandler.getBlackQueen());
-        }else {
-            setTileImage(tile.getX(), tile.getY(), tile.getPiece().isWhite() ? imageHandler.getWhiteKing() : imageHandler.getBlackKing());
+    private void drawBoard() {
+        for(int y = 0; y < 8; y++) {
+            for(int x = 0; x < 8; x++) {
+                Tile tile = game.getBoard().getTile(y, x);
+                setTileImage(y , x, imageHandler.getImageByPiece( tile.getPiece()));
+            }
         }
     }
 
@@ -175,25 +152,7 @@ public class DisplayBoard extends JFrame {
         Tile sourceTile = game.getBoard().getTile(x, y);
         if(selectedTile != null) {
             if(markedSquares.contains(sourceTile)) {
-                boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
-                game.getBoard().printBoard();
-                if(!canMakeMove) {
-                    return;
-                }
-                removeMarkers();
-                Piece destPiece = game.getBoard().getTile(x, y).getPiece();
-                System.out.println("Destination piece:" + destPiece);
-                setTileImage(sourceTile.getX(), sourceTile.getY(), imageHandler.getImageByPiece(destPiece));
-                removeTileImage(selectedTile.getX(), selectedTile.getY());
-                selectedTile = null;
-                if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
-                    currentState.setText(game.getState().getDisplayName());
-                    turnOffAllSquares();
-                    increaseScoreOfWinner(game.getState());
-                    return;
-                }
-                switchStateLabelToCurrentState();
-                return;
+                processPotentialMove(sourceTile);
             }
         }
 
@@ -210,6 +169,24 @@ public class DisplayBoard extends JFrame {
         }
         markedSquares = validMoves;
         selectedTile = sourceTile;
+    }
+
+    private void processPotentialMove(Tile sourceTile) {
+        boolean canMakeMove = game.playerMove(selectedTile.getX(), selectedTile.getY(), sourceTile.getX(), sourceTile.getY());
+        game.getBoard().printBoard();
+        if(!canMakeMove) {
+            return;
+        }
+        removeMarkers();
+        selectedTile = null;
+        drawBoard();
+        if(game.getState() == GameState.WHITE_WON || game.getState() == GameState.BLACK_WON ) {
+            currentState.setText(game.getState().getDisplayName());
+            turnOffAllSquares();
+            increaseScoreOfWinner(game.getState());
+            return;
+        }
+        switchStateLabelToCurrentState();
     }
 
     private void increaseScoreOfWinner(GameState state) {
@@ -230,7 +207,6 @@ public class DisplayBoard extends JFrame {
         for(int i = 0; i < BOARD_SIZE; i++) {
             for(int j = 0; j < BOARD_SIZE; j++) {
                 MouseListener[] mouseListeners = squares[i][j].getMouseListeners();
-
                 for (MouseListener ml : mouseListeners) {
                     squares[i][j].removeMouseListener(ml);
                 }
@@ -240,10 +216,6 @@ public class DisplayBoard extends JFrame {
 
     private BoardSquare getTile(int row, int col) {
         return squares[row][col];
-    }
-
-    private void removeTileImage(int row, int col) {
-        getTile(row, col).removeTileImage();
     }
 
     private void removeMarkers(){
@@ -260,6 +232,7 @@ public class DisplayBoard extends JFrame {
     private void setTileImage(int row, int col, Image image) {
         BoardSquare square = getTile(row, col);
         square.removeTileImage();
+        if(image == null) return;
         square.setTileImage(image);
     }
 

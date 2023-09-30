@@ -7,6 +7,7 @@ public class Move {
     final Tile dst;
     private boolean castlingMove = false;
     private boolean isPromotionMove = false;
+    private boolean isFirstMove = false;
 
     public Tile getSrc() {
         return src;
@@ -36,5 +37,13 @@ public class Move {
 
     public boolean isPromotionMove() {
         return isPromotionMove;
+    }
+
+    public boolean isFirstMove() {
+        return isFirstMove;
+    }
+
+    public void setIsFirstMove(boolean isFirstMove) {
+        this.isFirstMove = isFirstMove;
     }
 }
