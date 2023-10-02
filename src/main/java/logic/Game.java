@@ -1,6 +1,6 @@
 package main.java.logic;
 
-import main.java.gui.chessboard.PromotionWindow;
+import main.java.gui.chessframe.BoardPanel;
 import main.java.logic.pieces.*;
 
 import java.util.List;
@@ -47,6 +47,11 @@ public class Game {
         currentPlayer = players[0] == currentPlayer ? players[1] : players[0];
         //lastGameStates.push(currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE);
         //state = currentPlayer.isWhiteSide() ? GameState.WHITE_TO_MOVE : GameState.BLACK_TO_MOVE;
+    }
+
+    public Move getLastMove() {
+        if (lastMoves.isEmpty()) return null;
+        return lastMoves.peek();
     }
 
     public boolean playerMove(int startRow, int startColumn, int endRow, int endColumn) {
@@ -126,7 +131,7 @@ public class Game {
     }
 
     private Piece openPromotionWindow(boolean isWhite) {
-        PromotionWindow promotionWindow = new PromotionWindow();
+        BoardPanel.PromotionWindow promotionWindow = new BoardPanel.PromotionWindow();
         String promotionPiece = promotionWindow.getPromotionPiece();
         return Piece.fromString(promotionPiece, isWhite);
     }
@@ -196,6 +201,9 @@ public class Game {
     public void revertToLastGameState() {
         if (lastGameStates.isEmpty()) return;
         lastGameStates.pop();
+        if (lastGameStates.isEmpty()){
+            lastGameStates.push(GameState.WHITE_TO_MOVE);
+        }
         state = lastGameStates.peek();
     }
 

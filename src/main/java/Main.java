@@ -1,8 +1,6 @@
 package main.java;
 
-import main.java.gui.chessboard.DisplayBoard;
 import main.java.gui.menu.MainMenu;
-import main.java.logic.Game;
 import main.java.logic.Player;
 
 public class Main {

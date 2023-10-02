@@ -1,4 +1,4 @@
-package main.java.gui.chessboard;
+package main.java.gui.logic;
 
 import main.java.logic.pieces.Piece;
 import main.java.logic.pieces.PieceEnum;
