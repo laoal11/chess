@@ -46,4 +46,9 @@ public class Move {
     public void setIsFirstMove(boolean isFirstMove) {
         this.isFirstMove = isFirstMove;
     }
+
+    @Override
+    public String toString() {
+        return src.toString() + " to: " + dst.toString();
+    }
 }

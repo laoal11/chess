@@ -1,6 +1,6 @@
 package main.java.gui.menu;
 
-import main.java.gui.chessboard.DisplayBoard;
+import main.java.gui.chessframe.MainFrame;
 import main.java.logic.Game;
 import main.java.logic.Player;
 
@@ -18,7 +18,6 @@ public class MainMenu extends JFrame {
         this.setSize(400, 400);
         setLocationRelativeTo(null); // center the frame on the screen
 
-
         // Add button 1
         JButton localGame = new JButton("Local game");
         GridBagConstraints c1 = new GridBagConstraints();
@@ -29,7 +28,8 @@ public class MainMenu extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Game match = new Game(white, black);
-                new DisplayBoard(match, white, black);
+                //new DisplayBoard(match, white, black);
+                new MainFrame(match, white, black);
             }
         });
         add(localGame, c1);

@@ -1,4 +1,4 @@
-package main.java.gui.chessboard;
+package main.java.gui.logic;
 
 import main.java.logic.pieces.Piece;
 import main.java.logic.pieces.PieceEnum;
@@ -38,8 +38,7 @@ public class ImageHandler {
             this.blackKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_black.png"));
             this.whiteKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_white.png"));
             this.marker = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\target.png"));
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Could not load image");
         }
     }
