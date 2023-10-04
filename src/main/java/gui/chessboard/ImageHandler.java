@@ -25,21 +25,21 @@ public class ImageHandler {
 
     public ImageHandler() {
         try{
-            this.blackBishop = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\bishop_black.png"));
-            this.whiteBishop = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\bishop_white.png"));
-            this.blackRook = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\rook_black.png"));
-            this.whiteRook = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\rook_white.png"));
-            this.blackKnight = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\knight_black.png"));
-            this.whiteKnight = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\knight_white.png"));
-            this. blackPawn = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\pawn_black.png"));
-            this.whitePawn = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\pawn_white.png"));
-            this.blackQueen = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\queen_black.png"));
-            this.whiteQueen = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\queen_white.png"));
-            this.blackKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_black.png"));
-            this.whiteKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_white.png"));
-            this.marker = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\target.png"));
-
+            this.blackBishop = ImageIO.read(getClass().getResourceAsStream("/images/bishop_black.png"));
+            this.whiteBishop = ImageIO.read(getClass().getResource("/images/bishop_white.png"));
+            this.blackRook = ImageIO.read(getClass().getResource("/images/rook_black.png"));
+            this.whiteRook = ImageIO.read(getClass().getResource("/images/rook_white.png"));
+            this.blackKnight = ImageIO.read(getClass().getResource("/images/knight_black.png"));
+            this.whiteKnight = ImageIO.read(getClass().getResource("/images/knight_white.png"));
+            this. blackPawn = ImageIO.read(getClass().getResource("/images/pawn_black.png"));
+            this.whitePawn = ImageIO.read(getClass().getResource("/images/pawn_white.png"));
+            this.blackQueen = ImageIO.read(getClass().getResource("/images/queen_black.png"));
+            this.whiteQueen = ImageIO.read(getClass().getResource("/images/queen_white.png"));
+            this.blackKing = ImageIO.read(getClass().getResource("/images/king_black.png"));
+            this.whiteKing = ImageIO.read(getClass().getResource("/images/king_white.png"));
+            this.marker = ImageIO.read(getClass().getResource("/images/target.png"));
         }catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException("Could not load image");
         }
     }
