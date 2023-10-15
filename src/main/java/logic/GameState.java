@@ -1,7 +1,7 @@
 package main.java.logic;
 
 public enum GameState {
-    READY("Ready to start"),
+    DRAW("DRAW"),
     WHITE_TO_MOVE("White to move"),
     BLACK_TO_MOVE("Black to move"),
     WHITE_IN_CHECK("White is in check"),

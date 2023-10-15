@@ -4,7 +4,7 @@ package main.java.logic;
 public class Player {
     final private boolean whiteSide;
     private String name;
-    private int score = 0;
+    private double score = 0;
 
     public Player(boolean whiteSide) {
         this.whiteSide = whiteSide;
@@ -16,12 +16,12 @@ public class Player {
         this.name = name;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void increaseScore() {
-        score++;
+    public void increaseScore(double points) {
+        score += points;
     }
 
     public boolean isWhiteSide() {
