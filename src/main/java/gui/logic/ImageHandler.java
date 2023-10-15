@@ -2,6 +2,7 @@ package main.java.gui.logic;
 
 import main.java.logic.pieces.Piece;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
