@@ -1,27 +1,27 @@
-package main.java.gui.chessboard;
+package main.java.gui.logic;
 
 import main.java.logic.pieces.Piece;
-import main.java.logic.pieces.PieceEnum;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.Objects;
+
+import static javax.imageio.ImageIO.read;
 
 public class ImageHandler {
 
-    final private BufferedImage blackBishop;
-    final private BufferedImage whiteBishop;
-    final private BufferedImage blackRook;
-    final private BufferedImage whiteRook;
-    final private BufferedImage blackKnight;
-    final private BufferedImage whiteKnight;
-    final private BufferedImage blackPawn;
-    final private BufferedImage whitePawn;
-    final private BufferedImage blackQueen;
-    final private BufferedImage whiteQueen;
-    final private BufferedImage blackKing;
-    final private BufferedImage whiteKing;
-    final private BufferedImage marker;
+    private final BufferedImage blackBishop;
+    private final BufferedImage whiteBishop;
+    private final BufferedImage blackRook;
+    private final BufferedImage whiteRook;
+    private final BufferedImage blackKnight;
+    private final BufferedImage whiteKnight;
+    private final BufferedImage blackPawn;
+    private final BufferedImage whitePawn;
+    private final BufferedImage blackQueen;
+    private final BufferedImage whiteQueen;
+    private final BufferedImage blackKing;
+    private final BufferedImage whiteKing;
+    private final BufferedImage marker;
 
     public ImageHandler() {
         try{
@@ -49,21 +49,14 @@ public class ImageHandler {
             return null;
         }
         boolean isWhite = piece.isWhite();
-        switch (piece.getPieceType()) {
-            case PAWN:
-                return isWhite ? whitePawn : blackPawn;
-            case ROOK:
-                return isWhite ? whiteRook : blackRook;
-            case KNIGHT:
-                return isWhite ? whiteKnight : blackKnight;
-            case BISHOP:
-                return isWhite ? whiteBishop : blackBishop;
-            case QUEEN:
-                return isWhite ? whiteQueen : blackQueen;
-            case KING:
-                return isWhite ? whiteKing : blackKing;
-        }
-        return null;
+        return switch (piece.getPieceType()) {
+            case PAWN -> isWhite ? whitePawn : blackPawn;
+            case ROOK -> isWhite ? whiteRook : blackRook;
+            case KNIGHT -> isWhite ? whiteKnight : blackKnight;
+            case BISHOP -> isWhite ? whiteBishop : blackBishop;
+            case QUEEN -> isWhite ? whiteQueen : blackQueen;
+            case KING -> isWhite ? whiteKing : blackKing;
+        };
     }
 
     public BufferedImage getBlackBishop() {

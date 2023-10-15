@@ -19,7 +19,7 @@ public class Controller {
     }
 
     public void updateLastMove() {
-        infoPanel.updateLastMove();
+        infoPanel.updateLastMoveList();
     }
 
     public void updateStateLabel() {

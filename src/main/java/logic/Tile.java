@@ -7,6 +7,8 @@ public class Tile {
 
     private int x;
     private int y;
+    private final int uniCodeNumber = 65; // Unicode for 'A'
+
 
     public int getX() {
         return x;
@@ -40,6 +42,12 @@ public class Tile {
 
     @Override
     public String toString() {
-        return "[x = " + x + ", y = " + y + "]";
+        //[x = 6, y = 0] : Left pawn
+        //A 2
+
+        // Casting int to char
+        char column = (char) (uniCodeNumber + y);
+        int row = 8 - x;
+        return column + "" + row;
     }
 }
