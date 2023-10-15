@@ -1,44 +1,43 @@
-package main.java.gui.chessboard;
+package main.java.gui.logic;
 
 import main.java.logic.pieces.Piece;
-import main.java.logic.pieces.PieceEnum;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.Objects;
+
+import static javax.imageio.ImageIO.read;
 
 public class ImageHandler {
 
-    final private BufferedImage blackBishop;
-    final private BufferedImage whiteBishop;
-    final private BufferedImage blackRook;
-    final private BufferedImage whiteRook;
-    final private BufferedImage blackKnight;
-    final private BufferedImage whiteKnight;
-    final private BufferedImage blackPawn;
-    final private BufferedImage whitePawn;
-    final private BufferedImage blackQueen;
-    final private BufferedImage whiteQueen;
-    final private BufferedImage blackKing;
-    final private BufferedImage whiteKing;
-    final private BufferedImage marker;
+    private final BufferedImage blackBishop;
+    private final BufferedImage whiteBishop;
+    private final BufferedImage blackRook;
+    private final BufferedImage whiteRook;
+    private final BufferedImage blackKnight;
+    private final BufferedImage whiteKnight;
+    private final BufferedImage blackPawn;
+    private final BufferedImage whitePawn;
+    private final BufferedImage blackQueen;
+    private final BufferedImage whiteQueen;
+    private final BufferedImage blackKing;
+    private final BufferedImage whiteKing;
+    private final BufferedImage marker;
 
     public ImageHandler() {
         try{
-            this.blackBishop = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\bishop_black.png"));
-            this.whiteBishop = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\bishop_white.png"));
-            this.blackRook = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\rook_black.png"));
-            this.whiteRook = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\rook_white.png"));
-            this.blackKnight = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\knight_black.png"));
-            this.whiteKnight = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\knight_white.png"));
-            this. blackPawn = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\pawn_black.png"));
-            this.whitePawn = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\pawn_white.png"));
-            this.blackQueen = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\queen_black.png"));
-            this.whiteQueen = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\queen_white.png"));
-            this.blackKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_black.png"));
-            this.whiteKing = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\king_white.png"));
-            this.marker = ImageIO.read(new File("C:\\Users\\Pascal\\IdeaProjects\\chess_app\\src\\main\\resources\\pieces\\target.png"));
-
+            this.blackBishop = read(Objects.requireNonNull(getClass().getResourceAsStream("/images/bishop_black.png")));
+            this.whiteBishop = read(Objects.requireNonNull(getClass().getResource("/images/bishop_white.png")));
+            this.blackRook = read(Objects.requireNonNull(getClass().getResource("/images/rook_black.png")));
+            this.whiteRook = read(Objects.requireNonNull(getClass().getResource("/images/rook_white.png")));
+            this.blackKnight = read(Objects.requireNonNull(getClass().getResource("/images/knight_black.png")));
+            this.whiteKnight = read(Objects.requireNonNull(getClass().getResource("/images/knight_white.png")));
+            this. blackPawn = read(Objects.requireNonNull(getClass().getResource("/images/pawn_black.png")));
+            this.whitePawn = read(Objects.requireNonNull(getClass().getResource("/images/pawn_white.png")));
+            this.blackQueen = read(Objects.requireNonNull(getClass().getResource("/images/queen_black.png")));
+            this.whiteQueen = read(Objects.requireNonNull(getClass().getResource("/images/queen_white.png")));
+            this.blackKing = read(Objects.requireNonNull(getClass().getResource("/images/king_black.png")));
+            this.whiteKing = read(Objects.requireNonNull(getClass().getResource("/images/king_white.png")));
+            this.marker = read(Objects.requireNonNull(getClass().getResource("/images/target.png")));
         }catch (Exception e) {
             throw new RuntimeException("Could not load image");
         }
@@ -49,21 +48,14 @@ public class ImageHandler {
             return null;
         }
         boolean isWhite = piece.isWhite();
-        switch (piece.getPieceType()) {
-            case PAWN:
-                return isWhite ? whitePawn : blackPawn;
-            case ROOK:
-                return isWhite ? whiteRook : blackRook;
-            case KNIGHT:
-                return isWhite ? whiteKnight : blackKnight;
-            case BISHOP:
-                return isWhite ? whiteBishop : blackBishop;
-            case QUEEN:
-                return isWhite ? whiteQueen : blackQueen;
-            case KING:
-                return isWhite ? whiteKing : blackKing;
-        }
-        return null;
+        return switch (piece.getPieceType()) {
+            case PAWN -> isWhite ? whitePawn : blackPawn;
+            case ROOK -> isWhite ? whiteRook : blackRook;
+            case KNIGHT -> isWhite ? whiteKnight : blackKnight;
+            case BISHOP -> isWhite ? whiteBishop : blackBishop;
+            case QUEEN -> isWhite ? whiteQueen : blackQueen;
+            case KING -> isWhite ? whiteKing : blackKing;
+        };
     }
 
     public BufferedImage getBlackBishop() {

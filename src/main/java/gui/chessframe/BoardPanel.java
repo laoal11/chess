@@ -1,10 +1,9 @@
 package main.java.gui.chessframe;
 
 import main.java.gui.logic.Controller;
-import main.java.gui.logic.ImageHandler;
 import main.java.logic.Game;
 import main.java.logic.GameState;
-import main.java.logic.Player;
+import main.java.gui.logic.*;
 import main.java.logic.Tile;
 import main.java.logic.pieces.Piece;
 

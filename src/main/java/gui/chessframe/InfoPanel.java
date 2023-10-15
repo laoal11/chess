@@ -8,7 +8,6 @@ import main.java.logic.Player;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Stack;
 
 public class InfoPanel extends JPanel {
 
@@ -17,19 +16,22 @@ public class InfoPanel extends JPanel {
 
     private JLabel p1Label;
     private JLabel p2Label;
-    private JPanel lastMovesPanel;
+    private LastMovesPanel lastMovesPanel;
     private Game game;
     private Controller controller;
     private final Player p1;
     private final Player p2;
 
-    private Stack<JLabel> lastMovesLabels;
+    //private DefaultListModel<String> lastMovesList;
 
     InfoPanel(Game game, Player p1, Player p2) {
         this.game = game;
         this.p1 = p1;
         this.p2 = p2;
-        lastMovesLabels = new Stack<>();
+
+        //lastMovesList = new DefaultListModel<>();
+        lastMovesPanel = new LastMovesPanel();
+
         initCurrentStatePanel();
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -40,8 +42,7 @@ public class InfoPanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0,5)));
         add(createPlayerScores());
         add(Box.createRigidArea(new Dimension(0,5)));
-        add(createLastMovesPanel());
-        //this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // creates some padding
+        add(lastMovesPanel);
     }
 
     private JPanel createGameButtons() {
@@ -79,26 +80,10 @@ public class InfoPanel extends JPanel {
         return playerScores;
     }
 
-    private JPanel createLastMovesPanel() {
-        lastMovesPanel = new JPanel();
-        lastMovesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        lastMovesPanel.setLayout(new BoxLayout(lastMovesPanel, BoxLayout.Y_AXIS));
-        JLabel description = new JLabel("Last moves: ");
-        description.setFont(new Font(description.getFont().getName(), Font.BOLD, 16));
-        lastMovesPanel.add(description);
-        return lastMovesPanel;
-    }
-
-    public void updateLastMove() {
+    public void updateLastMoveList() {
         Move lastMove = game.getLastMove();
-        JLabel latestMoveLabel = new JLabel(lastMove.toString());
-        lastMovesPanel.add(latestMoveLabel);
-        lastMovesLabels.push(latestMoveLabel);
-    }
-
-    public void removeLastMove() {
-        if(lastMovesLabels.isEmpty()) return;
-        lastMovesPanel.remove(lastMovesLabels.pop());
+        lastMovesPanel.addMove(lastMove);
+        //lastMovesList.addElement(lastMove.toString());
     }
 
     public void setController(Controller controller) {
@@ -113,6 +98,7 @@ public class InfoPanel extends JPanel {
         game.restartGame();
         switchStateLabelToCurrentState();
         controller.resetBoard();
+        lastMovesPanel.restart();
     }
 
     public void switchStateLabelToCurrentState() {
@@ -143,9 +129,8 @@ public class InfoPanel extends JPanel {
         game.changeCurrentPlayer();
         game.getBoard().printBoard();
         switchStateLabelToCurrentState();
-        removeLastMove();
+        lastMovesPanel.removeLastMove();
         controller.removeMarkers();
         controller.drawBoard();
     }
-
 }
